@@ -4,7 +4,7 @@ cp openshift.conf frontend/conf/
 
 pushd frontend
   mv conf/application.conf.dist conf/application.conf
-  sbt clean compile stage
+  sbt clean update compile stage
 popd
 
 mv frontend/target/staged/ .
