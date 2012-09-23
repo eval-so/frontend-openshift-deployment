@@ -1,4 +1,6 @@
 cd `dirname $0`
+git rm -rf staged start
+git commit -m "Deploying from upstream at: `date`"
 git clone git://github.com/breakpoint-eval/frontend
 cp openshift.conf frontend/conf/
 
@@ -13,7 +15,5 @@ mv frontend/target/start .
 rm -rf frontend
 
 git add .
-git commit -m "Deploying from upstream at: `date`"
+git commit --am -m "Deploying from upstream at: `date`"
 git push origin master
-
-rm -rf staged start
