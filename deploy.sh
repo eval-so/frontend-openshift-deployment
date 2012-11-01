@@ -2,11 +2,31 @@
 DIR="$( cd -P "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 pushd $DIR
 git rm -rf staged start
+rm -rf frontend
 git commit -m "Deploying from upstream at: `date`"
-git clone git://github.com/breakpoint-eval/frontend
-cp openshift.conf frontend/conf/
+git clone git@github.com:breakpoint-eval/frontend
 
 pushd frontend
+
+  # Do documentation stuff.
+  temp=`mktemp -d`
+  if [[ ! "$temp" == "" ]]; then
+    sbt doc
+    mv target/scala-*/api/* $temp
+    rm -rf project target
+    git checkout gh-pages
+    git rm -rf *
+    mv $temp/* .
+    git add .
+    git commit -m "Updating documentation from master (via deploy.sh)"
+    git push origin gh-pages
+    git checkout master
+  else
+    echo "Bailing out, somehow \$temp is '' and something bad happened."
+    exit 1
+  fi
+
+  cp ../openshift.conf ./conf/
   mv conf/application.conf.dist conf/application.conf
   for file in $(find ./app/assets/ -type f -print); do
     gzip -c -9 $file > $file.gz
